@@ -1,4 +1,9 @@
+use crate::model::notification::Notification;
+use bambangshop::REQWEST_CLIENT;
+use rocket;
+use rocket::serde::json::to_string;
 use rocket::serde::{Deserialize, Serialize};
+use rocket::tokio;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(crate = "rocket::serde")]
@@ -18,7 +23,7 @@ impl Subscriber {
             .await
             .ok();
 
-        log::warn!("Sent {} notification of: [{}], to: {}",
-            payload.status, payload.id, payload.product_title, self.url);
+        rocket::info!("Sent {} notification of: [{}] {}, to: {}",
+            payload.status, payload.product_type, payload.product_title, self.url);
     }
 }
