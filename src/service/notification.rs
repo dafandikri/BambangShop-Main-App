@@ -27,4 +27,23 @@ impl NotificationService {
         }
         return Ok(result.unwrap());
     }
+
+    pub fn notify(&self, product_type: &str, status: &str, product: Product) {
+        let payload: Notification = Notification {
+            product_title: product.clone().title,
+            product_id: String::from(product.clone().id),
+            product_type: String::from(product_type),
+            subscriber_url: String::from(""),
+            subscriber_name: String::from(""),
+            status: String::from(status),
+        };
+
+        let subscribers: Vec<Subscriber> = SubscriberRepository::list_all(product_type);
+        for subscriber in subscribers {
+            let payload_subscriber_name = subscriber.clone().name;
+            let subscriber_clone = subscriber.clone();
+            let payload_clone = payload.clone();
+            thread::spawn(move || subscriber_clone.update(payload_clone));
+        }
+    }
 }
