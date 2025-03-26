@@ -1,12 +1,15 @@
 # BambangShop Publisher App
+
 Tutorial and Example for Advanced Programming 2024 - Faculty of Computer Science, Universitas Indonesia
 
 ---
 
 ## About this Project
+
 In this repository, we have provided you a REST (REpresentational State Transfer) API project using Rocket web framework.
 
 This project consists of four modules:
+
 1.  `controller`: this module contains handler functions used to receive request and send responses.
     In Model-View-Controller (MVC) pattern, this is the Controller part.
 2.  `model`: this module contains structs that serve as data containers.
@@ -35,48 +38,66 @@ You can also make automated functional testing scripts for REST API projects usi
 You can install Postman via this website: https://www.postman.com/downloads/
 
 ## How to Run in Development Environment
+
 1.  Set up environment variables first by creating `.env` file.
     Here is the example of `.env` file:
     ```bash
     APP_INSTANCE_ROOT_URL="http://localhost:8000"
     ```
     Here are the details of each environment variable:
-    | variable              | type   | description                                                |
+    | variable | type | description |
     |-----------------------|--------|------------------------------------------------------------|
     | APP_INSTANCE_ROOT_URL | string | URL address where this publisher instance can be accessed. |
 2.  Use `cargo run` to run this app.
     (You might want to use `cargo check` if you only need to verify your work without running the app.)
 
 ## Mandatory Checklists (Publisher)
--   [ ] Clone https://gitlab.com/ichlaffterlalu/bambangshop to a new repository.
--   **STAGE 1: Implement models and repositories**
-    -   [ ] Commit: `Create Subscriber model struct.`
-    -   [ ] Commit: `Create Notification model struct.`
-    -   [ ] Commit: `Create Subscriber database and Subscriber repository struct skeleton.`
-    -   [ ] Commit: `Implement add function in Subscriber repository.`
-    -   [ ] Commit: `Implement list_all function in Subscriber repository.`
-    -   [ ] Commit: `Implement delete function in Subscriber repository.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-1" questions in this README.
--   **STAGE 2: Implement services and controllers**
-    -   [ ] Commit: `Create Notification service struct skeleton.`
-    -   [ ] Commit: `Implement subscribe function in Notification service.`
-    -   [ ] Commit: `Implement subscribe function in Notification controller.`
-    -   [ ] Commit: `Implement unsubscribe function in Notification service.`
-    -   [ ] Commit: `Implement unsubscribe function in Notification controller.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-2" questions in this README.
--   **STAGE 3: Implement notification mechanism**
-    -   [ ] Commit: `Implement update method in Subscriber model to send notification HTTP requests.`
-    -   [ ] Commit: `Implement notify function in Notification service to notify each Subscriber.`
-    -   [ ] Commit: `Implement publish function in Program service and Program controller.`
-    -   [ ] Commit: `Edit Product service methods to call notify after create/delete.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-3" questions in this README.
+
+- [ ] Clone https://gitlab.com/ichlaffterlalu/bambangshop to a new repository.
+- **STAGE 1: Implement models and repositories**
+  - [ ] Commit: `Create Subscriber model struct.`
+  - [ ] Commit: `Create Notification model struct.`
+  - [ ] Commit: `Create Subscriber database and Subscriber repository struct skeleton.`
+  - [ ] Commit: `Implement add function in Subscriber repository.`
+  - [ ] Commit: `Implement list_all function in Subscriber repository.`
+  - [ ] Commit: `Implement delete function in Subscriber repository.`
+  - [ ] Write answers of your learning module's "Reflection Publisher-1" questions in this README.
+- **STAGE 2: Implement services and controllers**
+  - [ ] Commit: `Create Notification service struct skeleton.`
+  - [ ] Commit: `Implement subscribe function in Notification service.`
+  - [ ] Commit: `Implement subscribe function in Notification controller.`
+  - [ ] Commit: `Implement unsubscribe function in Notification service.`
+  - [ ] Commit: `Implement unsubscribe function in Notification controller.`
+  - [ ] Write answers of your learning module's "Reflection Publisher-2" questions in this README.
+- **STAGE 3: Implement notification mechanism**
+  - [ ] Commit: `Implement update method in Subscriber model to send notification HTTP requests.`
+  - [ ] Commit: `Implement notify function in Notification service to notify each Subscriber.`
+  - [ ] Commit: `Implement publish function in Program service and Program controller.`
+  - [ ] Commit: `Edit Product service methods to call notify after create/delete.`
+  - [ ] Write answers of your learning module's "Reflection Publisher-3" questions in this README.
 
 ## Your Reflections
+
 This is the place for you to write reflections:
 
 ### Mandatory (Publisher) Reflections
 
 #### Reflection Publisher-1
+
+1. **Subscriber as Interface vs. Concrete Class:**
+   In the classic Observer pattern described in Head First Design Pattern, Observer is typically defined as an interface. In the BambangShop case, we're using a concrete `Subscriber` struct instead of a trait (Rust's equivalent of an interface). This approach works well here because all subscribers have the same behavior - they receive HTTP notifications via the same mechanism. Using a concrete struct simplifies the implementation.
+
+   However, if we needed to support multiple notification mechanisms (e.g., HTTP, WebSockets, email), then a trait would be more appropriate. A trait would allow different subscriber implementations while maintaining a common interface for the notification process.
+
+2. **Vec vs. DashMap for Unique Identifiers:**
+   Using DashMap instead of Vec is necessary in this case because we need efficient lookups, updates, and deletions based on unique identifiers (URL for Subscribers). With a Vec, operations like finding or deleting a specific subscriber would require O(n) time complexity as we'd need to iterate through the entire list. DashMap provides near-constant time O(1) access, making operations much more efficient when dealing with unique identifiers.
+
+   Additionally, DashMap maintains the association between keys (URLs) and values (Subscriber objects), ensuring uniqueness and providing a natural way to organize subscribers by product type.
+
+3. **DashMap vs. Singleton Pattern for Thread-Safety:**
+   In our implementation, we're actually using both patterns for different purposes. The `lazy_static!` macro essentially implements the Singleton pattern by ensuring SUBSCRIBERS is initialized only once. Meanwhile, DashMap provides thread-safe concurrent access to the map structure itself.
+
+   We still need DashMap (or an alternative like HashMap with Mutex/RwLock) because Singleton alone doesn't address thread safety of operations on the contained data structure. DashMap simplifies our code by providing thread-safety out of the box, avoiding explicit lock management that would be necessary with regular collections.
 
 #### Reflection Publisher-2
 
